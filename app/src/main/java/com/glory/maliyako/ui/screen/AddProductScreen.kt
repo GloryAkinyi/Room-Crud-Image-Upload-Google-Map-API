@@ -5,22 +5,36 @@ import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.glory.maliyako.R
+import com.glory.maliyako.navigation.Routes
 import com.glory.maliyako.viewmodel.ProductViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddProductScreen(navController: NavController, viewModel: ProductViewModel) {
     var name by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
+    var showMenu by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
 
@@ -32,34 +46,145 @@ fun AddProductScreen(navController: NavController, viewModel: ProductViewModel) 
         }
     }
 
-    Column(modifier = Modifier.padding(16.dp)) {
-        TextField(value = name, onValueChange = { name = it }, label = { Text("Product Name") })
-        TextField(value = price, onValueChange = { price = it }, label = { Text("Product Price") })
-
-        // Image Picker Box
-        Box(
-            modifier = Modifier
-                .size(150.dp)
-                .clickable { imagePicker.launch("image/*") }
-        ) {
-            if (imageUri != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(model = imageUri),
-                    contentDescription = "Selected Image"
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Add Product", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(imageVector = Icons.Default.KeyboardArrowLeft, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { showMenu = true }) {
+                        Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
+                    }
+                    DropdownMenu(
+                        expanded = showMenu,
+                        onDismissRequest = { showMenu = false }
+                    ) {
+                        DropdownMenuItem(
+                            text = { Text("Product List") },
+                            onClick = {
+                                navController.navigate(Routes.ProductList.route)
+                                showMenu = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Add Product") },
+                            onClick = {
+                                navController.navigate(Routes.AddProduct.route)
+                                showMenu = false
+                            }
+                        )
+                    }
+                }
+            )
+        },
+        bottomBar = {
+            BottomNavigationBar(navController)
+        },
+        content = { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Product Name
+                OutlinedTextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Product Name") },
+                    leadingIcon = { Icon(painter = painterResource(R.drawable.baseline_dynamic_feed_24), contentDescription = "Name") },
+                    modifier = Modifier.fillMaxWidth()
                 )
-            } else {
-                Text("Tap to pick image")
-            }
-        }
 
-        Button(onClick = {
-            val priceValue = price.toDoubleOrNull()
-            if (priceValue != null) {
-                imageUri?.toString()?.let { viewModel.addProduct(name, priceValue, it) } // Save URI as String
-                navController.popBackStack()
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Product Price
+                OutlinedTextField(
+                    value = price,
+                    onValueChange = { price = it },
+                    label = { Text("Product Price") },
+                    leadingIcon = { Icon(painter = painterResource(R.drawable.baseline_architecture_24), contentDescription = "Price") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Image Picker Box
+                Box(
+                    modifier = Modifier
+                        .size(200.dp)
+                        .background(Color.LightGray, shape = RoundedCornerShape(10.dp))
+                        .clickable { imagePicker.launch("image/*") },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (imageUri != null) {
+                        Image(
+                            painter = rememberAsyncImagePainter(model = imageUri),
+                            contentDescription = "Selected Image",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(painter = painterResource(R.drawable.image), contentDescription = "Pick Image")
+                            Text("Tap to pick image", color = Color.DarkGray)
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                // Add Product Button
+                Button(
+                    onClick = {
+                        val priceValue = price.toDoubleOrNull()
+                        if (priceValue != null) {
+                            imageUri?.toString()?.let { viewModel.addProduct(name, priceValue, it) }
+                            navController.popBackStack()
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(Color.LightGray)
+                ) {
+                    Text("Add Product", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                }
             }
-        }, modifier = Modifier.padding(top = 8.dp)) {
-            Text("Add Product")
         }
+    )
+}
+
+// Bottom Navigation Bar Component
+@Composable
+fun BottomNavigationBar(navController: NavController) {
+    NavigationBar(
+        containerColor = Color(0xFFDFDAC8),
+        contentColor = Color.White
+    ) {
+        NavigationBarItem(
+            selected = false,
+            onClick = { navController.navigate(Routes.ProductList.route) },
+            icon = { Icon(Icons.Default.Home, contentDescription = "Product List") },
+            label = { Text("Home") }
+        )
+        NavigationBarItem(
+            selected = false,
+            onClick = { navController.navigate(Routes.AddProduct.route) },
+            icon = { Icon(Icons.Default.AddCircle, contentDescription = "Add Product") },
+            label = { Text("Add") }
+        )
+
+
+        NavigationBarItem(
+            selected = false,
+            onClick = { navController.navigate(Routes.AddProduct.route) },
+            icon = { Icon(painter = painterResource(R.drawable.profile), contentDescription = "Price") },
+            label = { Text("Profile") }
+        )
     }
 }

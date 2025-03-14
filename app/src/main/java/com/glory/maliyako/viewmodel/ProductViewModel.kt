@@ -1,8 +1,9 @@
 package com.glory.maliyako.viewmodel
 
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 import com.glory.maliyako.model.Product
-import kotlinx.coroutines.launch
 
 class ProductViewModel : ViewModel() {
     private val _allProducts = MutableLiveData<List<Product>>(emptyList())
@@ -10,7 +11,7 @@ class ProductViewModel : ViewModel() {
 
     fun addProduct(name: String, price: Double, imageUri: String) {
         val newList = _allProducts.value.orEmpty().toMutableList()
-        newList.add(Product(0, name, price, imageUri))
+        newList.add(Product(id = newList.size + 1, name = name, price = price, imagePath = imageUri))
         _allProducts.value = newList
     }
 

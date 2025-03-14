@@ -1,5 +1,7 @@
 package com.glory.maliyako.ui.screen
 
+import android.net.Uri
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -7,6 +9,7 @@ import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 import com.glory.maliyako.model.Product
 import com.glory.maliyako.viewmodel.ProductViewModel
 
@@ -26,6 +29,13 @@ fun EditProductScreen(productId: Int, navController: NavController, viewModel: P
             TextField(value = name, onValueChange = { name = it }, label = { Text("Product Name") })
             TextField(value = price, onValueChange = { price = it }, label = { Text("Product Price") })
             TextField(value = imagePath, onValueChange = { imagePath = it }, label = { Text("Image Path") })
+
+            // ✅ Display the selected image
+            Image(
+                painter = rememberAsyncImagePainter(model = Uri.parse(imagePath)),
+                contentDescription = "Product Image",
+                modifier = Modifier.size(100.dp)
+            )
 
             Button(
                 onClick = {
