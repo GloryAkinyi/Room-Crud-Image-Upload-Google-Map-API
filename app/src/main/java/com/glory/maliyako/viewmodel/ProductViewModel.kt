@@ -9,9 +9,9 @@ class ProductViewModel : ViewModel() {
     private val _allProducts = MutableLiveData<List<Product>>(emptyList())
     val allProducts: LiveData<List<Product>> = _allProducts
 
-    fun addProduct(name: String, price: Double, imageUri: String) {
+    fun addProduct(name: String, price: Double,phone:String, imageUri: String) {
         val newList = _allProducts.value.orEmpty().toMutableList()
-        newList.add(Product(id = newList.size + 1, name = name, price = price, imagePath = imageUri))
+        newList.add(Product(id = newList.size + 1, name = name, price = price,phone = phone, imagePath = imageUri))
         _allProducts.value = newList
     }
 

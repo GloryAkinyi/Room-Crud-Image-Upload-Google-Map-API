@@ -1,5 +1,6 @@
 package com.glory.maliyako.ui.screen
 
+import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -18,9 +19,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.glory.maliyako.viewmodel.ProductViewModel
@@ -143,6 +146,12 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
                     fontSize = 16.sp,
                     color = Color.White
                 )
+
+
+
+
+
+
             }
 
             // Update and Delete Buttons positioned at the bottom-right
@@ -155,6 +164,31 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
+
+                    val mContext = LocalContext.current
+                    OutlinedButton(
+                        onClick = {
+                            val smsIntent= Intent(Intent.ACTION_SENDTO)
+                            smsIntent.data = "smsto:${product.phone}".toUri()
+                            smsIntent.putExtra("sms_body","Hello Seller,...?")
+                            mContext.startActivity(smsIntent)
+                        },
+                        shape = RoundedCornerShape(8.dp),
+
+                        ) {
+                        Row {
+                            Icon(
+                                imageVector = Icons.Default.Send,
+                                contentDescription = "Message Seller")
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Text(
+                                text = "Message Seller"
+                            )
+                        }
+                    }
+
+
+
                     IconButton(
                         onClick = {
                             navController.navigate(Routes.EditProduct.createRoute(product.id))

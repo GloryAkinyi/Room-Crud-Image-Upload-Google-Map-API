@@ -8,5 +8,6 @@ data class Product(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val name: String,
     val price: Double,
+    val phone: String,
     val imagePath: String  // Path of the stored image
 )

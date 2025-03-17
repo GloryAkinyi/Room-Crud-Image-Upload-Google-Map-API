@@ -33,6 +33,7 @@ import com.glory.maliyako.viewmodel.ProductViewModel
 fun AddProductScreen(navController: NavController, viewModel: ProductViewModel) {
     var name by remember { mutableStateOf("") }
     var price by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
     var imageUri by remember { mutableStateOf<Uri?>(null) }
     var showMenu by remember { mutableStateOf(false) }
 
@@ -113,6 +114,20 @@ fun AddProductScreen(navController: NavController, viewModel: ProductViewModel) 
                     modifier = Modifier.fillMaxWidth()
                 )
 
+
+
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // Phone Number
+                OutlinedTextField(
+                    value = phone,
+                    onValueChange = { phone = it },
+                    label = { Text("Phone Number") },
+                    leadingIcon = { Icon(painter = painterResource(R.drawable.phone), contentDescription = "Price") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Image Picker Box
@@ -145,7 +160,7 @@ fun AddProductScreen(navController: NavController, viewModel: ProductViewModel) 
                     onClick = {
                         val priceValue = price.toDoubleOrNull()
                         if (priceValue != null) {
-                            imageUri?.toString()?.let { viewModel.addProduct(name, priceValue, it) }
+                            imageUri?.toString()?.let { viewModel.addProduct(name, priceValue, phone,it) }
                             navController.popBackStack()
                         }
                     },
@@ -184,7 +199,7 @@ fun BottomNavigationBar(navController: NavController) {
         NavigationBarItem(
             selected = false,
             onClick = { navController.navigate(Routes.AddProduct.route) },
-            icon = { Icon(painter = painterResource(R.drawable.profile), contentDescription = "Price") },
+            icon = { Icon(painter = painterResource(R.drawable.profile), contentDescription = "") },
             label = { Text("Profile") }
         )
     }
