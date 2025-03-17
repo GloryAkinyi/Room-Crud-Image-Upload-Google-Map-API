@@ -18,12 +18,12 @@ fun AppNavHost(navController: NavHostController, viewModel: ProductViewModel) { 
         composable(Routes.AddProduct.route) {
             AddProductScreen(navController, viewModel) // ✅ Pass correctly
         }
-        composable(
-            route = Routes.EditProduct.route + "/{productId}",
-            arguments = listOf(navArgument("productId") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val productId = backStackEntry.arguments?.getInt("productId") ?: 0
-            EditProductScreen(productId, navController, viewModel) // ✅ Pass correctly
+        // Add EditProductScreen and extract productId from the argument
+        composable(Routes.EditProduct.route) { backStackEntry ->
+            val productId = backStackEntry.arguments?.getString("productId")?.toIntOrNull()
+            if (productId != null) {
+                EditProductScreen(productId, navController, viewModel)
+            }
         }
     }
 }

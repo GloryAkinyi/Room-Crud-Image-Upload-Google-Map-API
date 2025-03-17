@@ -50,6 +50,7 @@ fun AddProductScreen(navController: NavController, viewModel: ProductViewModel) 
         topBar = {
             TopAppBar(
                 title = { Text("Add Product", fontSize = 20.sp, fontWeight = FontWeight.Bold) },
+                colors = TopAppBarDefaults.mediumTopAppBarColors(Color.LightGray),
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(imageVector = Icons.Default.KeyboardArrowLeft, contentDescription = "Back")
@@ -163,7 +164,7 @@ fun AddProductScreen(navController: NavController, viewModel: ProductViewModel) 
 @Composable
 fun BottomNavigationBar(navController: NavController) {
     NavigationBar(
-        containerColor = Color(0xFFDFDAC8),
+        containerColor = Color(0xFF6F6A72),
         contentColor = Color.White
     ) {
         NavigationBarItem(

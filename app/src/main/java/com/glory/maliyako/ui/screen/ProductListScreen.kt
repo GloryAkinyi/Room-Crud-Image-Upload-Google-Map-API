@@ -37,6 +37,7 @@ fun ProductListScreen(navController: NavController, viewModel: ProductViewModel)
         topBar = {
             TopAppBar(
                 title = { Text("Products", fontSize = 20.sp) },
+                colors = TopAppBarDefaults.mediumTopAppBarColors(Color.LightGray),
                 actions = {
                     IconButton(onClick = { showMenu = true }) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
@@ -155,7 +156,10 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     IconButton(
-                        onClick = { navController.navigate(Routes.EditProduct.createRoute(product.id)) }
+                        onClick = {
+                            navController.navigate(Routes.EditProduct.createRoute(product.id))
+
+                        }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
@@ -185,7 +189,7 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
 @Composable
 fun BottomNavigationBar1(navController: NavController) {
     NavigationBar(
-        containerColor = Color(0xFF6200EE),
+        containerColor = Color(0xFF6F6A72),
         contentColor = Color.White
     ) {
         NavigationBarItem(
