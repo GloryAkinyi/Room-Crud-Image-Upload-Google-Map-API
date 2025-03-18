@@ -42,6 +42,8 @@ fun ProductListScreen(navController: NavController, viewModel: ProductViewModel)
                 title = { Text("Products", fontSize = 20.sp) },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(Color.LightGray),
                 actions = {
+
+                    //Menu with navigation
                     IconButton(onClick = { showMenu = true }) {
                         Icon(imageVector = Icons.Default.MoreVert, contentDescription = "Menu")
                     }
@@ -64,6 +66,7 @@ fun ProductListScreen(navController: NavController, viewModel: ProductViewModel)
                             }
                         )
                     }
+                    //End of menu with navigation
                 }
             )
         },
@@ -87,6 +90,8 @@ fun ProductListScreen(navController: NavController, viewModel: ProductViewModel)
         }
     }
 }
+
+
 
 @Composable
 fun ProductItem(navController: NavController, product: Product, viewModel: ProductViewModel) {
@@ -117,23 +122,26 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
                 contentScale = ContentScale.Crop
             )
 
-            // Gradient Overlay for readability
+            // Gradient Overlay at the bottom for readability
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
+                    .height(120.dp) // Height of the gradient overlay
+                    .align(Alignment.BottomStart) // Align to the bottom
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
+                            startY = 0f, // Start from the top of the Box
+                            endY = Float.POSITIVE_INFINITY // End at the bottom
                         )
                     )
             )
 
-            // Product Info on top of the image
+            // Product Info (Name and Price) positioned just above the buttons
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(12.dp),
-                verticalArrangement = Arrangement.Bottom
+                    .align(Alignment.BottomStart) // Align to the bottom-left
+                    .padding(start = 12.dp, bottom = 60.dp) // Adjust padding to position above buttons
             ) {
                 Text(
                     text = product.name,
@@ -146,53 +154,41 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
                     fontSize = 16.sp,
                     color = Color.White
                 )
-
-
-
-
-
-
             }
 
-            // Update and Delete Buttons positioned at the bottom-right
+            // Buttons (Message Seller, Edit, Delete) positioned at the bottom-right
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .padding(8.dp)
-                    .align(Alignment.BottomEnd) // Aligns to bottom right
+                    .align(Alignment.BottomEnd) // Align to the bottom-right
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-
                     val mContext = LocalContext.current
                     OutlinedButton(
                         onClick = {
-                            val smsIntent= Intent(Intent.ACTION_SENDTO)
+                            val smsIntent = Intent(Intent.ACTION_SENDTO)
                             smsIntent.data = "smsto:${product.phone}".toUri()
-                            smsIntent.putExtra("sms_body","Hello Seller,...?")
+                            smsIntent.putExtra("sms_body", "Hello Seller,...?")
                             mContext.startActivity(smsIntent)
                         },
                         shape = RoundedCornerShape(8.dp),
-
-                        ) {
+                    ) {
                         Row {
                             Icon(
                                 imageVector = Icons.Default.Send,
-                                contentDescription = "Message Seller")
-                            Spacer(modifier = Modifier.width(3.dp))
-                            Text(
-                                text = "Message Seller"
+                                contentDescription = "Message Seller"
                             )
+                            Spacer(modifier = Modifier.width(3.dp))
+                            Text(text = "Message Seller")
                         }
                     }
-
-
 
                     IconButton(
                         onClick = {
                             navController.navigate(Routes.EditProduct.createRoute(product.id))
-
                         }
                     ) {
                         Icon(
@@ -208,7 +204,7 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Delete",
-                            tint = Color.Red
+                            tint = Color.White
                         )
                     }
                 }
@@ -217,13 +213,11 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
     }
 }
 
-
-
 // Bottom Navigation Bar Component
 @Composable
 fun BottomNavigationBar1(navController: NavController) {
     NavigationBar(
-        containerColor = Color(0xFF6F6A72),
+        containerColor = Color(0xFFA2B9A2),
         contentColor = Color.White
     ) {
         NavigationBarItem(
