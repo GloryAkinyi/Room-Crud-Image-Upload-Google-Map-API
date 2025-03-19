@@ -41,6 +41,22 @@ fun ProductListScreen(navController: NavController, viewModel: ProductViewModel)
             TopAppBar(
                 title = { Text("Products", fontSize = 20.sp) },
                 colors = TopAppBarDefaults.mediumTopAppBarColors(Color.LightGray),
+                navigationIcon = {
+                    IconButton(
+                        onClick = {
+
+                            navController.navigate(Routes.Location.route)
+
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = "Location",
+                            tint = Color.White
+                        )
+                    }
+
+                },
                 actions = {
 
                     //Menu with navigation
