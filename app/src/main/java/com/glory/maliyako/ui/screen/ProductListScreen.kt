@@ -1,7 +1,14 @@
 package com.glory.maliyako.ui.screen
 
+
+import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.pdf.PdfDocument
 import android.net.Uri
+import android.os.Environment
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,15 +27,24 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.net.toUri
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.glory.maliyako.R
 import com.glory.maliyako.viewmodel.ProductViewModel
-import com.glory.maliyako.navigation.Routes
 import com.glory.maliyako.model.Product
+import com.glory.maliyako.navigation.ROUT_ADD_PRODUCT
+import com.glory.maliyako.navigation.ROUT_EDIT_PRODUCT
+import com.glory.maliyako.navigation.ROUT_LOCATION
+import com.glory.maliyako.navigation.ROUT_PRODUCT_LIST
+import com.glory.maliyako.navigation.editProductRoute
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -45,7 +61,7 @@ fun ProductListScreen(navController: NavController, viewModel: ProductViewModel)
                     IconButton(
                         onClick = {
 
-                            navController.navigate(Routes.Location.route)
+                            navController.navigate(ROUT_LOCATION)
 
                         }
                     ) {
@@ -70,14 +86,14 @@ fun ProductListScreen(navController: NavController, viewModel: ProductViewModel)
                         DropdownMenuItem(
                             text = { Text("Product List") },
                             onClick = {
-                                navController.navigate(Routes.ProductList.route)
+                                navController.navigate(ROUT_PRODUCT_LIST)
                                 showMenu = false
                             }
                         )
                         DropdownMenuItem(
                             text = { Text("Add Product") },
                             onClick = {
-                                navController.navigate(Routes.AddProduct.route)
+                                navController.navigate(ROUT_ADD_PRODUCT)
                                 showMenu = false
                             }
                         )
@@ -114,6 +130,7 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
     val painter: Painter = rememberAsyncImagePainter(
         model = product.imagePath?.let { Uri.parse(it) } ?: Uri.EMPTY
     )
+    val context = LocalContext.current
 
     Card(
         modifier = Modifier
@@ -121,7 +138,7 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
             .padding(vertical = 8.dp)
             .clickable {
                 if (product.id != 0) {
-                    navController.navigate(Routes.EditProduct.createRoute(product.id))
+                    navController.navigate(ROUT_EDIT_PRODUCT)
                 }
             },
         shape = RoundedCornerShape(12.dp),
@@ -134,30 +151,28 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
                 contentDescription = "Product Image",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp), // Full card height
+                    .height(200.dp),
                 contentScale = ContentScale.Crop
             )
 
-            // Gradient Overlay at the bottom for readability
+            // Gradient Overlay
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(120.dp) // Height of the gradient overlay
-                    .align(Alignment.BottomStart) // Align to the bottom
+                    .height(120.dp)
+                    .align(Alignment.BottomStart)
                     .background(
                         Brush.verticalGradient(
-                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f)),
-                            startY = 0f, // Start from the top of the Box
-                            endY = Float.POSITIVE_INFINITY // End at the bottom
+                            colors = listOf(Color.Transparent, Color.Black.copy(alpha = 0.7f))
                         )
                     )
             )
 
-            // Product Info (Name and Price) positioned just above the buttons
+            // Product Info
             Column(
                 modifier = Modifier
-                    .align(Alignment.BottomStart) // Align to the bottom-left
-                    .padding(start = 12.dp, bottom = 60.dp) // Adjust padding to position above buttons
+                    .align(Alignment.BottomStart)
+                    .padding(start = 12.dp, bottom = 60.dp)
             ) {
                 Text(
                     text = product.name,
@@ -172,23 +187,23 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
                 )
             }
 
-            // Buttons (Message Seller, Edit, Delete) positioned at the bottom-right
+            // Buttons (Message, Edit, Delete, Download PDF)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(8.dp)
-                    .align(Alignment.BottomEnd) // Align to the bottom-right
+                    .align(Alignment.BottomEnd)
             ) {
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    val mContext = LocalContext.current
+                    // Message Seller
                     OutlinedButton(
                         onClick = {
                             val smsIntent = Intent(Intent.ACTION_SENDTO)
                             smsIntent.data = "smsto:${product.phone}".toUri()
                             smsIntent.putExtra("sms_body", "Hello Seller,...?")
-                            mContext.startActivity(smsIntent)
+                            context.startActivity(smsIntent)
                         },
                         shape = RoundedCornerShape(8.dp),
                     ) {
@@ -202,9 +217,10 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
                         }
                     }
 
+                    // Edit Product
                     IconButton(
                         onClick = {
-                            navController.navigate(Routes.EditProduct.createRoute(product.id))
+                            navController.navigate(editProductRoute(product.id))
                         }
                     ) {
                         Icon(
@@ -214,6 +230,7 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
                         )
                     }
 
+                    // Delete Product
                     IconButton(
                         onClick = { viewModel.deleteProduct(product) }
                     ) {
@@ -223,9 +240,78 @@ fun ProductItem(navController: NavController, product: Product, viewModel: Produ
                             tint = Color.White
                         )
                     }
+
+                    // Download PDF
+                    IconButton(
+                        onClick = { generateProductPDF(context, product) }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.baseline_file_download_24),
+                            contentDescription = "",
+                            tint = Color.White
+                        )
+                    }
                 }
             }
         }
+    }
+}
+
+
+
+fun generateProductPDF(context: Context, product: Product) {
+    val pdfDocument = PdfDocument()
+    val pageInfo = PdfDocument.PageInfo.Builder(300, 500, 1).create()  // Increased height for image
+    val page = pdfDocument.startPage(pageInfo)
+    val canvas = page.canvas
+    val paint = android.graphics.Paint()
+
+    // Load image from URI if available
+    val bitmap: Bitmap? = try {
+        product.imagePath?.let {
+            val uri = Uri.parse(it)
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                BitmapFactory.decodeStream(inputStream)
+            }
+        }
+    } catch (e: Exception) {
+        e.printStackTrace()
+        null
+    }
+
+    // Draw Image if available
+    bitmap?.let {
+        val scaledBitmap = Bitmap.createScaledBitmap(it, 250, 150, false)
+        canvas.drawBitmap(scaledBitmap, 25f, 20f, paint)  // Adjusted position
+    }
+
+    // Draw Text
+    paint.textSize = 16f
+    paint.isFakeBoldText = true
+    canvas.drawText("Product Details", 80f, 200f, paint)  // Moved down
+
+    paint.textSize = 12f
+    paint.isFakeBoldText = false
+    canvas.drawText("Name: ${product.name}", 50f, 230f, paint)
+    canvas.drawText("Price: Ksh${product.price}", 50f, 250f, paint)
+    canvas.drawText("Seller Phone: ${product.phone}", 50f, 270f, paint)
+
+    pdfDocument.finishPage(page)
+
+    // Save PDF
+    val downloadsPath =
+        Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+    val file = File(downloadsPath, "${product.name}_Details.pdf")
+
+    try {
+        val fos = FileOutputStream(file)
+        pdfDocument.writeTo(fos)
+        pdfDocument.close()
+        fos.close()
+        Toast.makeText(context, "PDF saved in Downloads!", Toast.LENGTH_LONG).show()
+    } catch (e: IOException) {
+        e.printStackTrace()
+        Toast.makeText(context, "Failed to save PDF!", Toast.LENGTH_LONG).show()
     }
 }
 
@@ -238,13 +324,13 @@ fun BottomNavigationBar1(navController: NavController) {
     ) {
         NavigationBarItem(
             selected = false,
-            onClick = { navController.navigate(Routes.ProductList.route) },
+            onClick = { navController.navigate(ROUT_PRODUCT_LIST) },
             icon = { Icon(Icons.Default.Home, contentDescription = "Product List") },
             label = { Text("Home") }
         )
         NavigationBarItem(
             selected = false,
-            onClick = { navController.navigate(Routes.AddProduct.route) },
+            onClick = { navController.navigate(ROUT_ADD_PRODUCT) },
             icon = { Icon(Icons.Default.AddCircle, contentDescription = "Add Product") },
             label = { Text("Add") }
         )

@@ -23,16 +23,20 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.glory.maliyako.model.Product
-import com.glory.maliyako.navigation.Routes
+import com.glory.maliyako.navigation.ROUT_ADD_PRODUCT
+import com.glory.maliyako.navigation.ROUT_PRODUCT_LIST
 import com.glory.maliyako.viewmodel.ProductViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProductScreen(productId: Int, navController: NavController, viewModel: ProductViewModel) {
+fun EditProductScreen(productId: Int?, navController: NavController, viewModel: ProductViewModel) {
     val context = LocalContext.current
     val productList by viewModel.allProducts.observeAsState(emptyList())
+
+    // Ensure productId is valid
     val product = remember(productList) { productList.find { it.id == productId } }
 
+    // Track state variables only when product is found
     var name by remember { mutableStateOf(product?.name ?: "") }
     var price by remember { mutableStateOf(product?.price?.toString() ?: "") }
     var imagePath by remember { mutableStateOf(product?.imagePath ?: "") }
@@ -66,14 +70,14 @@ fun EditProductScreen(productId: Int, navController: NavController, viewModel: P
                         DropdownMenuItem(
                             text = { Text("Home") },
                             onClick = {
-                                navController.navigate(Routes.ProductList.route)
+                                navController.navigate(ROUT_PRODUCT_LIST)
                                 showMenu = false
                             }
                         )
                         DropdownMenuItem(
                             text = { Text("Add Product") },
                             onClick = {
-                                navController.navigate(Routes.AddProduct.route)
+                                navController.navigate(ROUT_ADD_PRODUCT)
                                 showMenu = false
                             }
                         )
@@ -120,7 +124,7 @@ fun EditProductScreen(productId: Int, navController: NavController, viewModel: P
                 Button(
                     onClick = { imagePicker.launch("image/*") },
                     modifier = Modifier.fillMaxWidth()
-                        .padding(start = 40.dp,end=40.dp),
+                        .padding(start = 40.dp, end = 40.dp),
                     colors = ButtonDefaults.buttonColors(Color.LightGray)
                 ) {
                     Text("Change Image")
@@ -139,7 +143,7 @@ fun EditProductScreen(productId: Int, navController: NavController, viewModel: P
                         }
                     },
                     modifier = Modifier.fillMaxWidth()
-                        .padding(start = 40.dp,end=40.dp),
+                        .padding(start = 40.dp, end = 40.dp),
                     colors = ButtonDefaults.buttonColors(Color.Black)
                 ) {
                     Text("Update Product")
@@ -163,13 +167,13 @@ fun BottomNavigationBar2(navController: NavController) {
     ) {
         NavigationBarItem(
             selected = false,
-            onClick = { navController.navigate(Routes.ProductList.route) },
+            onClick = { navController.navigate(ROUT_PRODUCT_LIST) },
             icon = { Icon(Icons.Default.Menu, contentDescription = "Product List") },
             label = { Text("Products") }
         )
         NavigationBarItem(
             selected = false,
-            onClick = { navController.navigate(Routes.AddProduct.route) },
+            onClick = { navController.navigate(ROUT_ADD_PRODUCT) },
             icon = { Icon(Icons.Default.Menu, contentDescription = "Add Product") },
             label = { Text("Add") }
         )

@@ -25,7 +25,8 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
 import com.glory.maliyako.R
-import com.glory.maliyako.navigation.Routes
+import com.glory.maliyako.navigation.ROUT_ADD_PRODUCT
+import com.glory.maliyako.navigation.ROUT_PRODUCT_LIST
 import com.glory.maliyako.viewmodel.ProductViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -68,14 +69,14 @@ fun AddProductScreen(navController: NavController, viewModel: ProductViewModel) 
                         DropdownMenuItem(
                             text = { Text("Product List") },
                             onClick = {
-                                navController.navigate(Routes.ProductList.route)
+                                navController.navigate(ROUT_PRODUCT_LIST)
                                 showMenu = false
                             }
                         )
                         DropdownMenuItem(
                             text = { Text("Add Product") },
                             onClick = {
-                                navController.navigate(Routes.AddProduct.route)
+                                navController.navigate(ROUT_ADD_PRODUCT)
                                 showMenu = false
                             }
                         )
@@ -184,13 +185,13 @@ fun BottomNavigationBar(navController: NavController) {
     ) {
         NavigationBarItem(
             selected = false,
-            onClick = { navController.navigate(Routes.ProductList.route) },
+            onClick = { navController.navigate(ROUT_PRODUCT_LIST) },
             icon = { Icon(Icons.Default.Home, contentDescription = "Product List") },
             label = { Text("Home") }
         )
         NavigationBarItem(
             selected = false,
-            onClick = { navController.navigate(Routes.AddProduct.route) },
+            onClick = { navController.navigate(ROUT_ADD_PRODUCT) },
             icon = { Icon(Icons.Default.AddCircle, contentDescription = "Add Product") },
             label = { Text("Add") }
         )
@@ -198,7 +199,7 @@ fun BottomNavigationBar(navController: NavController) {
 
         NavigationBarItem(
             selected = false,
-            onClick = { navController.navigate(Routes.AddProduct.route) },
+            onClick = { navController.navigate(ROUT_ADD_PRODUCT) },
             icon = { Icon(painter = painterResource(R.drawable.profile), contentDescription = "") },
             label = { Text("Profile") }
         )

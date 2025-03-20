@@ -1,10 +1,11 @@
 package com.glory.maliyako.navigation
 
-sealed class Routes(val route: String) {
-    object ProductList : Routes("product_list")
-    object AddProduct : Routes("add_product")
-    object Location : Routes("location")
-    object EditProduct : Routes("edit_product/{productId}") {
-        fun createRoute(productId: Int) = "edit_product/$productId"
-    }
-}
+
+
+const val ROUT_PRODUCT_LIST = "product_list"
+const val ROUT_ADD_PRODUCT = "add_product"
+const val ROUT_LOCATION = "location"
+const val ROUT_EDIT_PRODUCT = "edit_product/{productId}"
+
+// ✅ Helper function for navigation
+fun editProductRoute(productId: Int) = "edit_product/$productId"
