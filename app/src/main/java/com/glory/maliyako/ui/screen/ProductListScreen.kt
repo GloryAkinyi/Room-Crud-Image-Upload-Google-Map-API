@@ -38,6 +38,7 @@ import com.glory.maliyako.R
 import com.glory.maliyako.viewmodel.ProductViewModel
 import com.glory.maliyako.model.Product
 import com.glory.maliyako.navigation.ROUT_ADD_PRODUCT
+import com.glory.maliyako.navigation.ROUT_CHAT
 import com.glory.maliyako.navigation.ROUT_EDIT_PRODUCT
 import com.glory.maliyako.navigation.ROUT_LOCATION
 import com.glory.maliyako.navigation.ROUT_PRODUCT_LIST
@@ -94,6 +95,14 @@ fun ProductListScreen(navController: NavController, viewModel: ProductViewModel)
                             text = { Text("Add Product") },
                             onClick = {
                                 navController.navigate(ROUT_ADD_PRODUCT)
+                                showMenu = false
+                            }
+                        )
+
+                        DropdownMenuItem(
+                            text = { Text("Chat With Us") },
+                            onClick = {
+                                navController.navigate(ROUT_CHAT)
                                 showMenu = false
                             }
                         )
