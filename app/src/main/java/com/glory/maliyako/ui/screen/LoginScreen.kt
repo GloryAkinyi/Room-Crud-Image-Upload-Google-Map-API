@@ -1,9 +1,7 @@
 package com.glory.maliyako.ui.screen
 
-
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -45,32 +43,26 @@ fun LoginScreen(
             onValueChange = { email = it },
             label = { Text("Email") }
         )
-
         Spacer(modifier = Modifier.height(8.dp))
-
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
             visualTransformation = PasswordVisualTransformation()
         )
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = { authViewModel.loginUser(email, password) }
-        ) {
+        Button(onClick = {
+            if (email.isBlank() || password.isBlank()) {
+                Toast.makeText(context, "Please enter email and password", Toast.LENGTH_SHORT).show()
+            } else {
+                authViewModel.loginUser(email, password)
+            }
+        }) {
             Text("Login")
         }
-
-
         Spacer(modifier = Modifier.height(16.dp))
-
-        Button(
-            onClick = {
-                navController.navigate(ROUT_REGISTER)
-            }
-        ) {
+        Button(onClick = { navController.navigate(ROUT_REGISTER) }) {
             Text("Go to register page")
         }
     }
